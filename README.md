@@ -16,23 +16,23 @@
 
 .
 ├── controllers
-│ └── v1
-│ └── user.controller.js
+│   └── v1
+│       └── user.controller.js
 ├── database
-│ └── db.js
+│   └── db.js
 ├── middlewares
-│ └── auth.middleware.js
+│   └── auth.middleware.js
 ├── models
-│ └── user.model.js
+│   └── user.model.js
 ├── routes
-│ └── v1
-│ ├── category.route.js
-│ ├── index.js
-│ ├── post.route.js
-│ ├── posts.route.js
-│ └── user.routes.js
+│   └── v1
+│       ├── category.route.js
+│       ├── index.js
+│       ├── post.route.js
+│       ├── posts.route.js
+│       └── user.routes.js
 ├── utils
-│ └── response.js
+│   └── response.js
 └── app.js
 
 ---

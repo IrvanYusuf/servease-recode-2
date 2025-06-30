@@ -12,32 +12,6 @@
 
 ---
 
-## 📁 Struktur Folder
-
-📦src
-┣ 📂controllers
-┃ ┣ 📂v1
-┃ ┃ ┗ 📜user.controller.js
-┃ ┗ 📂v2
-┣ 📂database
-┃ ┗ 📜db.js
-┣ 📂middlewares
-┃ ┗ 📜auth.middleware.js
-┣ 📂models
-┃ ┗ 📜user.model.js
-┣ 📂routes
-┃ ┗ 📂v1
-┃ ┃ ┣ 📜category.route.js
-┃ ┃ ┣ 📜index.js
-┃ ┃ ┣ 📜post.route.js
-┃ ┃ ┣ 📜posts.route.js
-┃ ┃ ┗ 📜user.routes.js
-┣ 📂utils
-┃ ┗ 📜response.js
-┗ 📜app.js
-
----
-
 ## 🛠️ Instalasi
 
 ```bash

@@ -41,11 +41,11 @@ npm run make:controller user
 npm run make:controller v1/User
 
 # kamu juga bisa menambahkan type function atau class
-npm run make:controller v1/User -- --type=function
 # akan membuat folder v1/user.controller.js (function controller)
+npm run make:controller v1/User -- --type=function
 
-# akan membuat folder v1/user.controller.js (class controller)
-# sekaligus menambahkan route ke index.js
+# akan membuat folder v1/user.route.js
+# sekaligus menambahkan route ke src/routes/v1/index.js
 npm run make:route v1/user.route.js
 
 # akan membuat middleware auth

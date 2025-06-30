@@ -75,4 +75,4 @@ module-alias
 
 Irvan Yusuf Cahyadi
 📍 Medan, Indonesia
-🔗 LinkedIn — GitHub
+🔗 [LinkedIn](https://www.linkedin.com/in/irvanyusufcahyadi/) — [GitHub](https://github.com/IrvanYusuf) - [Threads](https://www.threads.com/@irvanyusufcahyadi__)

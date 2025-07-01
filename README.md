@@ -25,9 +25,12 @@ npm install
 ## 🍙 Konfigurasi
 
 ```env
+MONGO_URI=xxxxxxx
 PORT=3300
-MONGO_URI=your_mongo_uri
-JWT_SECRET_KEY=your_secret_key
+#generate with openssl rand -base64 32
+JWT_SECRET_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+#db provider (mongodb, prisma)
+DB_PROVIDER=xxxxxx
 ```
 
 ---

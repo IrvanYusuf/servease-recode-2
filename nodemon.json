@@ -1,5 +1,5 @@
 {
   "watch": ["src"],
   "ext": "js,json",
-  "exec": "vite-node src/app.js"
+  "exec": "vite-node src/server.js"
 }

@@ -9,20 +9,14 @@ const userSchema = new Schema(
     email: {
       type: String,
       required: true,
-      unique: true,
     },
     password: {
       type: String,
       required: true,
     },
-    avatar: {
-      type: String,
-      required: false,
-    },
     role: {
       type: String,
-      enum: ["USER", "ADMIN"],
-      required: true,
+      enum: ["ADMIN", "USER"],
       default: "USER",
     },
   },

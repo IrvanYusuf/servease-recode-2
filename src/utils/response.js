@@ -28,7 +28,7 @@ class ApiResponse {
   };
 
   /**
-   * Sends a standardized success response to the client.
+   * Sends a standardized error response to the client.
    *
    * @function
    * @static

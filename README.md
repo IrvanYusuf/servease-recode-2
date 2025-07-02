@@ -29,8 +29,19 @@ MONGO_URI=xxxxxxx
 PORT=3300
 #generate with openssl rand -base64 32
 JWT_SECRET_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxx
-#db provider (mongodb, prisma)
+#db provider
 DB_PROVIDER=xxxxxx
+#timezone
+APP_TIMEZONE=Asia/Jakarta
+#mail settings
+MAIL_HOST=sandbox.smtp.mailtrap.io
+MAIL_PORT=587
+MAIL_USER=your_mailtrap_username
+MAIL_PASS=your_mailtrap_password
+MAIL_FROM=no-reply@yourapp.com
+# front end url
+FRONTEND_URL="http://localhost:5173"
+
 ```
 
 ---

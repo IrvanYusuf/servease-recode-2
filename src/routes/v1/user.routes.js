@@ -1,4 +1,5 @@
 import UserController from "@/controllers/v1/user.controller";
+import authMiddleware from "@/middlewares/auth.middleware";
 import express from "express";
 
 const router = express.Router();
@@ -7,7 +8,7 @@ const router = express.Router();
 router.post("/", UserController.createNewUser);
 
 // get all users
-router.get("/", UserController.getUsers);
+router.get("/", authMiddleware, UserController.getUsers);
 
 // find user by id
 router.get("/:id", UserController.findUserById);

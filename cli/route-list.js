@@ -1,6 +1,7 @@
 import "module-alias/register.js";
 import chalk from "chalk";
 import app from "@/app";
+import Table from "cli-table3";
 
 import pkg from "express/package.json" assert { type: "json" };
 
@@ -36,7 +37,11 @@ function listRoutes(app) {
           m.toUpperCase()
         );
         const handles = layer.route.stack.map((h) => getHandlerName(h.handle));
-        routes.push({ path, methods, handles });
+        // routes.push({ path, methods, handles });
+
+        const mainHandler = handles[handles.length - 1]; // gunakan handler terakhir sebagai utama
+
+        routes.push({ path, methods, handler: mainHandler });
       } else if (layer.name === "router" && layer.handle?.stack) {
         const pathPart = extractPathFromRegex(layer.regexp);
         traverse(layer.handle.stack, prefix + pathPart);
@@ -55,7 +60,7 @@ function listRoutes(app) {
       grouped[base].push({
         method,
         path: route.path,
-        handler: route.handles[i] || "<anonymous>",
+        handler: route.handler || "<anonymous>",
       });
     });
   });
@@ -67,13 +72,22 @@ function listRoutes(app) {
     console.log(
       `\n${chalk.blue("Group 📁")}${":".padEnd(2)} ${chalk.blue(prefix)}`
     );
-    grouped[prefix].forEach((r) => {
-      console.log(
-        chalk.yellow(r.method.padEnd(10)),
-        chalk.green(r.path.padEnd(20)),
-        chalk.cyan(r.handler)
-      );
+    const table = new Table({
+      head: [
+        chalk.bold.blue("Method"),
+        chalk.bold.blue("Path"),
+        chalk.bold.blue("Handler"),
+      ],
+      colWidths: [12, 55, 30],
     });
+    grouped[prefix].forEach((r) => {
+      table.push([
+        chalk.yellow(r.method),
+        chalk.green(r.path),
+        chalk.cyan(r.handler),
+      ]);
+    });
+    console.log(table.toString());
   });
   console.log(`\n📊 Total: ${routes.length} routes`);
 }

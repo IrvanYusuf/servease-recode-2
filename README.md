@@ -1,6 +1,6 @@
 # 📦 Boilerplate Express CLI
 
-> RESTful API backend untuk sistem manajemen pengguna menggunakan Express.js + MongoDB.
+> Boilerplate RESTful API backend menggunakan Express.js + MongoDB.
 
 ---
 

@@ -1,6 +1,6 @@
-import Joi from "joi";
+const Joi = require("joi");
 
-export const loginSchemaValidation = Joi.object({
+const loginSchemaValidation = Joi.object({
   email: Joi.string().email().required().messages({
     "string.empty": "Email is required",
     "string.email": "Email must be a valid email address",
@@ -11,7 +11,7 @@ export const loginSchemaValidation = Joi.object({
   }),
 });
 
-export const otpVerificationValidation = Joi.object({
+const otpVerificationValidation = Joi.object({
   otp: Joi.string().min(1).max(6).required().messages({
     "string.empty": "OTP is required",
     "string.min": "OTP is required",
@@ -23,7 +23,7 @@ export const otpVerificationValidation = Joi.object({
   }),
 });
 
-export const changePasswordValidation = Joi.object({
+const changePasswordValidation = Joi.object({
   currentPassword: Joi.string().min(3).required().messages({
     "string.empty": "Current password is required",
     "string.min": "Current password too short",
@@ -34,14 +34,14 @@ export const changePasswordValidation = Joi.object({
   }),
 });
 
-export const forgotPasswordValidation = Joi.object({
+const forgotPasswordValidation = Joi.object({
   email: Joi.string().email().required().messages({
     "string.empty": "Email is required",
     "string.email": "Invalid email format",
   }),
 });
 
-export const resetPasswordValidation = Joi.object({
+const resetPasswordValidation = Joi.object({
   newPassword: Joi.string().min(3).required().messages({
     "string.empty": "New password is required",
     "string.min": "New password too short",
@@ -52,7 +52,7 @@ export const resetPasswordValidation = Joi.object({
   }),
 });
 
-export const resetPasswordValidationWeb = resetPasswordValidation.concat(
+const resetPasswordValidationWeb = resetPasswordValidation.concat(
   Joi.object({
     token: Joi.string().length(64).hex().required().messages({
       "string.empty": "Token is required",
@@ -61,3 +61,12 @@ export const resetPasswordValidationWeb = resetPasswordValidation.concat(
     }),
   })
 );
+
+module.exports = {
+  changePasswordValidation,
+  forgotPasswordValidation,
+  loginSchemaValidation,
+  otpVerificationValidation,
+  resetPasswordValidation,
+  resetPasswordValidationWeb,
+};

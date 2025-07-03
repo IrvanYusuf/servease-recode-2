@@ -1,14 +1,13 @@
-import "module-alias/register.js";
-import dotenv from "dotenv";
-import express from "express";
-import connectDb from "@/database/db.js";
-import apiEndpoints from "@/routes/index.js";
-import cors from "cors";
+require("module-alias/register");
+// import dotenv from "dotenv";
+const express = require("express");
+const connectDb = require("@/database/db.js");
+const apiEndpoints = require("@/routes/index.js");
+const cors = require("cors");
 
-dotenv.config();
+// dotenv.config();
 
 const app = express();
-const router = express.Router();
 
 app.use(cors());
 app.use(express.json());
@@ -20,4 +19,4 @@ app.get("/", (req, res) => {
 });
 app.use("/api", apiEndpoints);
 
-export default app;
+module.exports = app;

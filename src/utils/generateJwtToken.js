@@ -1,4 +1,5 @@
-import jwt from "jsonwebtoken";
+const { CONFIG } = require("@/config/index.js");
+const jwt = require("jsonwebtoken");
 
 /**
  * Generate a signed JSON Web Token (JWT) with a custom expiration.
@@ -11,10 +12,12 @@ import jwt from "jsonwebtoken";
  * @example
  * const token = generateJwtToken({ id: user._id, email: user.email }, "1d");
  */
-export const generateJwtToken = (payload, expiredToken = "7d") => {
-  const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, {
+const generateJwtToken = (payload, expiredToken = "7d") => {
+  const token = jwt.sign(payload, CONFIG.JWT_SECRET_KEY, {
     expiresIn: expiredToken,
   });
 
   return token;
 };
+
+module.exports = generateJwtToken;

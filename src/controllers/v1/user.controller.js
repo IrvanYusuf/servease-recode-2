@@ -1,7 +1,7 @@
-import { User } from "@/models/user.model";
-import ApiResponse from "@/utils/response";
-import bcrypt from "bcryptjs";
-import { StatusCodes } from "http-status-codes";
+const { User } = require("@/models/user.model.js");
+const ApiResponse = require("@/utils/response.js");
+const bcrypt = require("bcryptjs");
+const { StatusCodes } = require("http-status-codes");
 
 class UserController {
   static createNewUser = async (req, res) => {
@@ -26,7 +26,9 @@ class UserController {
 
   static getUsers = async (req, res) => {
     try {
-      const users = await User.find().select("-password");
+      const users = await User.find().select("-password").lean();
+      // console.log("running");
+
       return ApiResponse.successResponse(res, "success get users", users);
     } catch (error) {
       return ApiResponse.errorResponse(res, "Internal server error", {
@@ -107,4 +109,4 @@ class UserController {
   };
 }
 
-export default UserController;
+module.exports = UserController;

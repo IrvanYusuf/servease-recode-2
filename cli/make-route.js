@@ -1,9 +1,6 @@
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const fs = require("fs");
+const path = require("path");
+const pluralize = require("pluralize");
 
 // Ambil argumen: path + options
 const args = process.argv.slice(2);
@@ -29,11 +26,11 @@ const filePath = path.join(routePath, routeFileName);
 const indexFilePath = path.join(routePath, "index.js");
 
 // Template isi route
-const content = `import express from "express"
+const content = `const express = require("express");
 
 const router = express.Router();
 
-export default router;
+module.exports = router;
 `;
 
 // Buat folder jika belum ada
@@ -50,17 +47,18 @@ if (fs.existsSync(filePath)) {
 fs.writeFileSync(filePath, content);
 
 let indexContent = "";
+const pluralName = pluralize(kebabName);
 
 if (!fs.existsSync(indexFilePath)) {
   // Jika index.js belum ada, buat baru
-  indexContent = `import express from "express";
+  indexContent = `const express = require("express");
 import ${kebabName}Routes from "./${routeFileName}";
 
 const router = express.Router();
 
-router.use("/${kebabName}s", ${kebabName}Routes);
+router.use("/${pluralName}", ${kebabName}Routes);
 
-export default router;
+module.exports = router;
 `;
   fs.writeFileSync(indexFilePath, indexContent);
   console.log(`✅ index.js created at: src/routes/${dirPath}/index.js`);
@@ -68,22 +66,25 @@ export default router;
   // Jika sudah ada, tambahkan import + router.use jika belum ada
   indexContent = fs.readFileSync(indexFilePath, "utf-8");
 
-  const importLine = `import ${kebabName}Routes from "./${routeFileName}";`;
-  const useLine = `router.use("/${kebabName}s", ${kebabName}Routes);`;
+  const importLine = `const ${kebabName}Routes = require("./${routeFileName}");`;
+  const useLine = `router.use("/${pluralName}", ${kebabName}Routes);`;
 
   if (!indexContent.includes(importLine)) {
     const lines = indexContent.split("\n");
 
     // Sisipkan import setelah express
     const expressIndex = lines.findIndex((line) =>
-      line.startsWith("import express")
+      line.startsWith("const express")
     );
     lines.splice(expressIndex + 1, 0, importLine);
 
     // Tambahkan router.use sebelum export
     const exportIndex = lines.findIndex((line) =>
-      line.includes("export default router")
+      line.includes("module.exports = router;")
     );
+
+    console.log("exportIndex", exportIndex);
+
     lines.splice(exportIndex, 0, useLine);
 
     fs.writeFileSync(indexFilePath, lines.join("\n"));

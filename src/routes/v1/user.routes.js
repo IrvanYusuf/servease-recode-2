@@ -1,6 +1,6 @@
-import UserController from "@/controllers/v1/user.controller";
-import authMiddleware from "@/middlewares/auth.middleware";
-import express from "express";
+const UserController = require("@/controllers/v1/user.controller.js");
+const authMiddleware = require("@/middlewares/auth.middleware.js");
+const express = require("express");
 
 const router = express.Router();
 
@@ -8,7 +8,7 @@ const router = express.Router();
 router.post("/", UserController.createNewUser);
 
 // get all users
-router.get("/", authMiddleware, UserController.getUsers);
+router.get("/", UserController.getUsers);
 
 // find user by id
 router.get("/:id", UserController.findUserById);
@@ -19,4 +19,4 @@ router.patch("/:id", UserController.updateUser);
 // delete user by id
 router.delete("/:id", UserController.deleteUser);
 
-export default router;
+module.exports = router;

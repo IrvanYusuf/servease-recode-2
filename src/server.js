@@ -1,6 +1,7 @@
-import app from "./app.js";
+const app = require("./app.js");
+const { CONFIG } = require("@/config/index.js");
 
-const PORT = process.env.PORT || 3300;
+const PORT = CONFIG.PORT || 3300;
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

@@ -1,27 +1,27 @@
 {
-  "name": "blog",
+  "name": "boilerplate-rest-api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon",
     "start": "node dist/server.js",
+    "test": "vite-node src/server.js",
     "build": "vite build",
     "make:controller": "node cli/make-controller.js",
     "make:route": "node cli/make-route.js",
     "make:middleware": "node cli/make-middleware.js",
     "make:model": "node cli/make-model.js",
     "make:auth": "node cli/make-auth.js",
-    "route:list": "vite-node cli/route-list.js"
+    "route:list": "node cli/route-list.js"
   },
   "keywords": [],
   "author": "Irvan Yusuf Cahyadi",
   "license": "ISC",
-  "type": "module",
+  "type": "commonjs",
   "dependencies": {
     "bcryptjs": "^3.0.2",
-    "chalk": "^5.4.1",
+    "chalk": "^4.1.2",
     "cli-table3": "^0.6.5",
     "cors": "^2.8.5",
     "dayjs": "^1.11.13",
@@ -34,13 +34,10 @@
     "mongodb": "^6.17.0",
     "mongoose": "^8.16.1",
     "nodemailer": "^7.0.4",
-    "otp-generator": "^4.0.1"
+    "otp-generator": "^4.0.1",
+    "pluralize": "^8.0.0"
   },
   "_moduleAliases": {
     "@": "src"
-  },
-  "devDependencies": {
-    "vite": "^7.0.0",
-    "vite-node": "^3.2.4"
   }
 }

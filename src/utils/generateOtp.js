@@ -1,7 +1,8 @@
-import { LENGTH_OTP } from "@/constant/constant";
-import otpGenerator from "otp-generator";
+// import { LENGTH_OTP } from "@/constant/constant";
+const { LENGTH_OTP } = require("@/constant/constant.js");
+const otpGenerator = require("otp-generator");
 
-export const generateOtp = () => {
+const generateOtp = () => {
   const otp = otpGenerator.generate(LENGTH_OTP, {
     specialChars: false,
     lowerCaseAlphabets: false,
@@ -10,3 +11,5 @@ export const generateOtp = () => {
 
   return otp;
 };
+
+module.exports = generateOtp;

@@ -1,17 +1,96 @@
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const fs = require("fs");
+const path = require("path");
+const chalk = require("chalk");
+const Table = require("cli-table3");
 
 // Ambil argumen: path + options
 const args = process.argv.slice(2);
 const input = args[0]; // v1/posts
 
-if (!input) {
+// Jika --help atau -h
+if (input === "--help" || input === "-h") {
+  console.log(chalk.bold.green("\n🛠  make:controller CLI Help\n"));
+
+  console.log(chalk.bold("Usage:"));
+  console.log(
+    "  " +
+      chalk.cyan("npm run make:controller") +
+      " " +
+      chalk.yellow("<path>") +
+      " -- [--type=class|function] [--resource]"
+  );
+  console.log("");
+
+  console.log(chalk.bold("Examples:"));
+  console.log("  " + chalk.cyan("npm run make:controller auth"));
+  console.log(
+    "  " + chalk.cyan("npm run make:controller v1/post -- --type=function")
+  );
+  console.log(
+    "  " + chalk.cyan("npm run make:controller v1/user -- --resource")
+  );
+  console.log(
+    "  " +
+      chalk.cyan(
+        "npm run make:controller v1/comment -- --type=class --resource"
+      )
+  );
+  console.log("");
+
+  const optionTable = new Table({
+    head: [chalk.bold("Option"), chalk.bold("Description")],
+    colWidths: [30, 60],
+  });
+
+  optionTable.push(["--help, -h", "Show this help message"]);
+  optionTable.push([
+    "--type=class",
+    "Generate a controller using class-based style (default)",
+  ]);
+  optionTable.push([
+    "--type=function",
+    "Generate a controller using function-based style",
+  ]);
+  optionTable.push([
+    "--resource",
+    "Generate resource methods: index, store, show, destroy",
+  ]);
+
+  console.log(chalk.bold("Options:"));
+  console.log(optionTable.toString());
+  console.log("");
+
+  const outputTable = new Table({
+    head: [chalk.bold("Output Structure"), chalk.bold("Description")],
+    colWidths: [30, 60],
+  });
+
+  outputTable.push(["index", "Return list of resources (GET /)"]);
+  outputTable.push(["store", "Store new resource (POST /)"]);
+  outputTable.push(["show", "Get single resource detail (GET /:id)"]);
+  outputTable.push(["destroy", "Delete resource (DELETE /:id)"]);
+
+  console.log(chalk.bold("Output Methods (when using --resource):"));
+  console.log(outputTable.toString());
+  console.log("");
+
+  console.log(chalk.bold("Output Location:"));
+  console.log(
+    "  " + chalk.yellow("src/controllers/<path>/<name>.controller.js")
+  );
+  console.log("");
+  console.log(chalk.bold("Example Output Location:"));
+  console.log("  " + chalk.yellow("src/controllers/auth.controller.js"));
+  console.log("  " + chalk.yellow("src/controllers/v1/post.controller.js"));
+  console.log("");
+
+  process.exit(0);
+}
+
+if (!input || input.startsWith("--")) {
+  console.error("❌ Invalid or missing controller path.");
   console.error(
-    "❌ Usage: npm run make:controller v1/posts [--type=class|function]"
+    "Usage: npm run make:controller v1/posts -- [--type=class|function] [--resource]"
   );
   process.exit(1);
 }
@@ -68,21 +147,18 @@ const filePath = path.join(basePath, fileName);
 let content = "";
 
 if (type === "class" && resource) {
-  content = `import { StatusCodes } from "http-status-codes";
+  content = `const { StatusCodes } = require("http-status-codes");
+const ApiResponse = require("@/utils/response.js");
 class ${className} {
   static index = async (req, res) => {
     try {
       // IMPLEMENT VALIDATION HERE
 
       // LOGIC APP
-      // you can use class ApiResponse.successResponse() from utils/response.js
-      //  return ApiResponse.successResponse(res,"success get datas",data,null,StatusCodes.CREATED);
-      res.status(StatusCodes.OK).json({ message: "${className} exampleMethod hit!" });
+      return ApiResponse.successResponse(res,"success get datas",data,null,StatusCodes.CREATED);
     } catch (error) {
       console.error(error);
-      // you can use class ApiResponse.errorResponse() from utils/response.js
-      // return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
+      return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});
     }
   };
 
@@ -91,14 +167,10 @@ class ${className} {
       // IMPLEMENT VALIDATION HERE
 
       // LOGIC APP
-      // you can use class ApiResponse.successResponse() from utils/response.js
-      //  return ApiResponse.successResponse(res,"success store data",data,null,StatusCodes.CREATED);
-      res.status(StatusCodes.OK).json({ message: "${className} exampleMethod hit!" });
+      return ApiResponse.successResponse(res,"success store data",data,null,StatusCodes.CREATED);
     } catch (error) {
       console.error(error);
-      // you can use class ApiResponse.errorResponse() from utils/response.js
-      // return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
+      return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});
     }
   };
 
@@ -107,14 +179,10 @@ class ${className} {
       // IMPLEMENT VALIDATION HERE
 
       // LOGIC APP
-      // you can use class ApiResponse.successResponse() from utils/response.js
-      //  return ApiResponse.successResponse(res,"success get detail",data,null,StatusCodes.CREATED);
-      res.status(StatusCodes.OK).json({ message: "${className} exampleMethod hit!" });
+      return ApiResponse.successResponse(res,"success get detail",data,null,StatusCodes.CREATED);
     } catch (error) {
       console.error(error);
-      // you can use class ApiResponse.errorResponse() from utils/response.js
-      // return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
+      return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});
     }
   };
 
@@ -123,35 +191,28 @@ class ${className} {
       // IMPLEMENT VALIDATION HERE
 
       // LOGIC APP
-      // you can use class ApiResponse.successResponse() from utils/response.js
-      //  return ApiResponse.successResponse(res,"success delete",data,null,StatusCodes.CREATED);
-      res.status(StatusCodes.OK).json({ message: "${className} exampleMethod hit!" });
+      return ApiResponse.successResponse(res,"success delete",data,null,StatusCodes.CREATED);
     } catch (error) {
       console.error(error);
-      // you can use class ApiResponse.errorResponse() from utils/response.js
-      // return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
+      return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});
     }
   };
 }
 
-export default ${className};
+module.exports = ${className};
 `;
 } else if (type === "function" && resource) {
-  content = `import { StatusCodes } from "http-status-codes";
+  content = `const { StatusCodes } = require("http-status-codes");
+const ApiResponse = require("@/utils/response.js");
 const index = async (req, res) => {
   try {
     // IMPLEMENT VALIDATION HERE
 
     // LOGIC APP
-    // you can use class ApiResponse.successResponse() from utils/response.js
-    //  return ApiResponse.successResponse(res,"success get datas",data,null,StatusCodes.CREATED);
-    res.status(StatusCodes.OK).json({ message: "Function-based controller hit!" });
+    return ApiResponse.successResponse(res,"success get datas",data,null,StatusCodes.CREATED);
   } catch (error) {
     console.error(error);
-    // you can use class ApiResponse.errorResponse() from utils/response.js
-    // return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
+    return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});
   }
 };
 
@@ -160,14 +221,10 @@ const store = async (req, res) => {
       // IMPLEMENT VALIDATION HERE
 
       // LOGIC APP
-      // you can use class ApiResponse.successResponse() from utils/response.js
-      //  return ApiResponse.successResponse(res,"success store data",data,null,StatusCodes.CREATED);
-      res.status(StatusCodes.OK).json({ message: "${className} exampleMethod hit!" });
+      return ApiResponse.successResponse(res,"success store data",data,null,StatusCodes.CREATED);
     } catch (error) {
       console.error(error);
-      // you can use class ApiResponse.errorResponse() from utils/response.js
-      // return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
+      return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});
     }
 };
 
@@ -176,14 +233,10 @@ const show = async (req, res) => {
       // IMPLEMENT VALIDATION HERE
 
       // LOGIC APP
-      // you can use class ApiResponse.successResponse() from utils/response.js
-      //  return ApiResponse.successResponse(res,"success get detail",data,null,StatusCodes.CREATED);
-      res.status(StatusCodes.OK).json({ message: "${className} exampleMethod hit!" });
+      return ApiResponse.successResponse(res,"success get detail",data,null,StatusCodes.CREATED);
     } catch (error) {
       console.error(error);
-      // you can use class ApiResponse.errorResponse() from utils/response.js
-      // return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
+      return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});
     }
 };
 
@@ -192,18 +245,14 @@ const destroy = async (req, res) => {
       // IMPLEMENT VALIDATION HERE
 
       // LOGIC APP
-      // you can use class ApiResponse.successResponse() from utils/response.js
-      //  return ApiResponse.successResponse(res,"success delete",data,null,StatusCodes.CREATED);
-      res.status(StatusCodes.OK).json({ message: "${className} exampleMethod hit!" });
+      return ApiResponse.successResponse(res,"success delete",data,null,StatusCodes.CREATED);
     } catch (error) {
       console.error(error);
-      // you can use class ApiResponse.errorResponse() from utils/response.js
-      // return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
+      return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});
     }
 };
 
-export default {
+module.exports = {
   index,
   store,
   show,
@@ -211,47 +260,41 @@ export default {
 };
 `;
 } else if (type === "class") {
-  content = `import { StatusCodes } from "http-status-codes";
+  content = `const { StatusCodes } = require("http-status-codes");
+const ApiResponse = require("@/utils/response.js");  
 class ${className} {
   static index = async (req, res) => {
     try {
       // IMPLEMENT VALIDATION HERE
 
       // LOGIC APP
-      // you can use class ApiResponse.successResponse() from utils/response.js
-      //  return ApiResponse.successResponse(res,"success get datas",data,null,StatusCodes.CREATED);
-      res.status(StatusCodes.OK).json({ message: "${className} exampleMethod hit!" });
+      return ApiResponse.successResponse(res,"success get datas",data,null,StatusCodes.CREATED);
     } catch (error) {
       console.error(error);
-      // you can use class ApiResponse.errorResponse() from utils/response.js
-      // return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
+      return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});
     }
   };
 }
 
-export default ${className};
+module.exports = ${className};
 `;
 } else {
   // function-based
-  content = `import { StatusCodes } from "http-status-codes";
+  content = `const { StatusCodes } = require("http-status-codes");
+const ApiResponse = require("@/utils/response.js");  
 const index = async (req, res) => {
   try {
     // IMPLEMENT VALIDATION HERE
 
     // LOGIC APP
-    // you can use class ApiResponse.successResponse() from utils/response.js
-    //  return ApiResponse.successResponse(res,"success",data,null,StatusCodes.CREATED);
-    res.status(StatusCodes.OK).json({ message: "Function-based controller hit!" });
+    return ApiResponse.successResponse(res,"success",data,null,StatusCodes.CREATED);
   } catch (error) {
     console.error(error);
-    // you can use class ApiResponse.errorResponse() from utils/response.js
-    // return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" });
+    return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});
   }
 };
 
-export default {
+module.exports = {
   index,
 };
 `;

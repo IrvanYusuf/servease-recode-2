@@ -1,4 +1,4 @@
-import { StatusCodes } from "http-status-codes";
+const { StatusCodes } = require("http-status-codes");
 
 class ApiResponse {
   /**
@@ -54,4 +54,4 @@ class ApiResponse {
   };
 }
 
-export default ApiResponse;
+module.exports = ApiResponse;

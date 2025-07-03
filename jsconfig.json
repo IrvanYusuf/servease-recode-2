@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
-    "baseUrl": "./src",
+    "baseUrl": ".", // root folder proyek
     "paths": {
-      "@/*": ["*"]
+      "@/*": ["src/*"]
     }
-  }
+  },
+  "include": ["src"]
 }

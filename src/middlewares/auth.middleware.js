@@ -1,5 +1,8 @@
-import jwt from "jsonwebtoken";
-import ApiResponse from "@/utils/response";
+const jwt = require("jsonwebtoken");
+// import ApiResponse from "@/utils/response";
+// import { CONFIG } from "@/config";
+const ApiResponse = require("@/utils/response.js");
+const { CONFIG } = require("../config/index.js");
 
 const authMiddleware = (req, res, next) => {
   const authHeader = req.headers["authorization"];
@@ -15,7 +18,7 @@ const authMiddleware = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const decoded = jwt.verify(token, CONFIG.JWT_SECRET_KEY);
     req.user = decoded; // simpan payload token ke req.user
     next();
   } catch (err) {
@@ -28,4 +31,4 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-export default authMiddleware;
+module.exports = authMiddleware;

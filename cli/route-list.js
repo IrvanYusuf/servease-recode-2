@@ -1,9 +1,9 @@
-import "module-alias/register.js";
-import chalk from "chalk";
-import app from "@/app";
-import Table from "cli-table3";
+require("module-alias/register.js");
+const chalk = require("chalk");
+const app = require("@/app");
+const Table = require("cli-table3");
 
-import pkg from "express/package.json" assert { type: "json" };
+const pkg = require("express/package.json");
 
 const expressVersion = pkg.version;
 

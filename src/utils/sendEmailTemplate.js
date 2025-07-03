@@ -1,9 +1,10 @@
-import transporter from "@/config/email.js";
+const { CONFIG } = require("@/config");
+const transporter = require("@/config/email");
 
-export const sendEmailTemplate = async (email, subject, emailTemplate) => {
+const sendEmailTemplate = async (email, subject, emailTemplate) => {
   try {
     await transporter.sendMail({
-      from: process.env.MAIL_FROM,
+      from: CONFIG.MAIL_FROM,
       to: email,
       subject,
       html: emailTemplate,
@@ -15,7 +16,7 @@ export const sendEmailTemplate = async (email, subject, emailTemplate) => {
   }
 };
 
-export const mobileEmailTemplateForgotPasswordOtp = (user, otp) => {
+const mobileEmailTemplateForgotPasswordOtp = (user, otp) => {
   let template = `
      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
       <h2 style="color: #333;">OTP Reset Password</h2>
@@ -30,8 +31,8 @@ export const mobileEmailTemplateForgotPasswordOtp = (user, otp) => {
   return template;
 };
 
-export const webEmailTemplateForgotPasswordOtp = (user, token) => {
-  const baseUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+const webEmailTemplateForgotPasswordOtp = (user, token) => {
+  const baseUrl = CONFIG.FRONTEND_URL || "http://localhost:5173";
   const url = `${baseUrl}/reset-password?token=${token}&credential=${encodeURIComponent(
     user._id
   )}`;
@@ -48,4 +49,10 @@ export const webEmailTemplateForgotPasswordOtp = (user, token) => {
       <p style="margin-top: 40px;">Thanks,<br/>Our Team</p>
     </div>
   `;
+};
+
+module.exports = {
+  mobileEmailTemplateForgotPasswordOtp,
+  webEmailTemplateForgotPasswordOtp,
+  sendEmailTemplate,
 };

@@ -1,28 +1,29 @@
-import { User } from "@/models/user.model";
-import ApiResponse from "@/utils/response";
-import { StatusCodes } from "http-status-codes";
-import bcrypt from "bcryptjs";
-import { SALT_BCRYPT } from "@/constant/constant";
-import { generateOtp } from "@/utils/generateOtp";
-import { generateJwtToken } from "@/utils/generateJwtToken";
-import { getAppTimezone } from "@/utils/getAppTimezone";
-import dayjs from "@/utils/dayjs.js";
-import {
+const { User } = require("@/models/user.model.js");
+const ApiResponse = require("@/utils/response.js");
+const { StatusCodes } = require("http-status-codes");
+const bcrypt = require("bcryptjs");
+const { SALT_BCRYPT } = require("@/constant/constant.js");
+const { generateOtp } = require("@/utils/generateOtp.js");
+const { generateJwtToken } = require("@/utils/generateJwtToken.js");
+const { getAppTimezone } = require("@/utils/getAppTimezone.js");
+const dayjs = require("@/utils/dayjs.js");
+
+const {
   changePasswordValidation,
   forgotPasswordValidation,
   loginSchemaValidation,
   otpVerificationValidation,
   resetPasswordValidation,
   resetPasswordValidationWeb,
-} from "@/validation/auth.validation";
-import {
+} = require("@/validation/auth.validation.js");
+
+const {
   mobileEmailTemplateForgotPasswordOtp,
   sendEmailTemplate,
   webEmailTemplateForgotPasswordOtp,
-} from "@/utils/sendEmailTemplate";
+} = require("@/utils/sendEmailTemplate.js");
 
-import crypto from "crypto";
-
+const crypto = require("crypto");
 
 class AuthController {
   static register = async (req, res) => {
@@ -149,7 +150,7 @@ class AuthController {
         StatusCodes.OK
       );
     } catch (error) {
-     console.error(`[2025-07-02T07:13:20.313Z]`, error);
+      console.error(`[2025-07-02T07:13:20.313Z]`, error);
       return ApiResponse.errorResponse(res, "Internal server error", {
         server: error.message,
       });
@@ -560,4 +561,4 @@ class AuthController {
   };
 }
 
-export default AuthController;
+module.exports = AuthController;

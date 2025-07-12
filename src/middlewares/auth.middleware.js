@@ -1,8 +1,7 @@
 const jwt = require("jsonwebtoken");
-// import ApiResponse from "@/utils/response";
-// import { CONFIG } from "@/config";
 const ApiResponse = require("@/utils/response.js");
 const { CONFIG } = require("../config/index.js");
+const { StatusCodes } = require("http-status-codes");
 
 const authMiddleware = (req, res, next) => {
   const authHeader = req.headers["authorization"];
@@ -13,7 +12,7 @@ const authMiddleware = (req, res, next) => {
       res,
       "Unauthorized",
       { auth: "No token provided" },
-      401
+      StatusCodes.UNAUTHORIZED
     );
   }
 
@@ -26,7 +25,7 @@ const authMiddleware = (req, res, next) => {
       res,
       "Forbidden or expired token",
       { auth: err.message },
-      403
+      StatusCodes.FORBIDDEN
     );
   }
 };

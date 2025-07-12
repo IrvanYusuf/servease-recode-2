@@ -19,6 +19,11 @@ if (!input) {
   process.exit(1);
 }
 
+if (dbProvider === "prisma") {
+  console.error(chalk.yellow("❌ For now only support mongodb provider"));
+  process.exit(1);
+}
+
 // Jika --help atau -h
 if (input === "--help" || input === "-h") {
   console.log(chalk.bold.green("\n🛠  make:model CLI Help\n"));

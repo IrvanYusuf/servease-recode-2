@@ -83,8 +83,6 @@ module.exports = router;
       line.includes("module.exports = router;")
     );
 
-    console.log("exportIndex", exportIndex);
-
     lines.splice(exportIndex, 0, useLine);
 
     fs.writeFileSync(indexFilePath, lines.join("\n"));

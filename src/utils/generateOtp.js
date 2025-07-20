@@ -1,4 +1,3 @@
-// import { LENGTH_OTP } from "@/constant/constant";
 const { LENGTH_OTP } = require("@/constant/constant.js");
 const otpGenerator = require("otp-generator");
 

@@ -23,4 +23,37 @@ const uploadToCloudinary = ({ buffer }) => {
   });
 };
 
-module.exports = uploadToCloudinary;
+const uploadMultipleToCloudinary = async (files) => {
+  const uploadPromises = files.map((file) =>
+    uploadToCloudinary({ buffer: file.buffer })
+  );
+
+  // Tunggu semua upload selesai
+  const urls = await Promise.all(uploadPromises);
+
+  return urls;
+};
+
+// video upload
+const uploadVideoToCloudinary = (buffer) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        resource_type: "video",
+        folder: CONFIG.CLOUDINARY_FOLDER,
+      },
+      (error, result) => {
+        if (result) resolve(result);
+        else reject(error);
+      }
+    );
+
+    streamifier.createReadStream(buffer).pipe(uploadStream);
+  });
+};
+
+module.exports = {
+  uploadToCloudinary,
+  uploadVideoToCloudinary,
+  uploadMultipleToCloudinary,
+};

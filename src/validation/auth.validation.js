@@ -1,5 +1,39 @@
 const Joi = require("joi");
 
+const registerSchemaValidation = Joi.object({
+  username: Joi.string().required().messages({
+    "string.empty": "Username is required",
+  }),
+  name: Joi.string().required().messages({
+    "string.empty": "Name is required",
+  }),
+  email: Joi.string().email().required().messages({
+    "string.empty": "Email is required",
+    "string.email": "Email must be a valid email address",
+  }),
+  password: Joi.string().min(3).required().messages({
+    "string.empty": "Password is required",
+    "string.min": "Password must be at least 3 characters",
+  }),
+  phone: Joi.string().min(12).max(15).required().messages({
+    "string.empty": "Phone number is required",
+    "string.min": "Phone number must be at least 12 digits",
+    "string.max": "Phone number max 15 digits",
+  }),
+  gender: Joi.string().valid("MALE", "FEMALE").required().messages({
+    "any.only": "Gender must be either MALE or FEMALE",
+    "string.empty": "Gender is required",
+  }),
+  role: Joi.string().valid("USER", "ADMIN", "PARTNER").required().messages({
+    "any.only": "role must be either USER, ADMIN or PARTNER",
+    "string.empty": "role is required",
+  }),
+  birthDate: Joi.date().required().messages({
+    "date.base": "Birth date must be a valid date",
+    "any.required": "Birth date is required",
+  }),
+});
+
 const loginSchemaValidation = Joi.object({
   email: Joi.string().email().required().messages({
     "string.empty": "Email is required",
@@ -69,4 +103,5 @@ module.exports = {
   otpVerificationValidation,
   resetPasswordValidation,
   resetPasswordValidationWeb,
+  registerSchemaValidation,
 };

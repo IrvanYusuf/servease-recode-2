@@ -3,9 +3,9 @@ const ApiResponse = require("@/utils/response.js");
 const { StatusCodes } = require("http-status-codes");
 const bcrypt = require("bcryptjs");
 const { SALT_BCRYPT } = require("@/constant/constant.js");
-const { generateOtp } = require("@/utils/generateOtp.js");
-const { generateJwtToken } = require("@/utils/generateJwtToken.js");
-const { getAppTimezone } = require("@/utils/getAppTimezone.js");
+const generateOtp = require("@/utils/generateOtp.js");
+const generateJwtToken = require("@/utils/generateJwtToken.js");
+const getAppTimezone = require("@/utils/getAppTimezone.js");
 const dayjs = require("@/utils/dayjs.js");
 
 const {
@@ -15,6 +15,7 @@ const {
   otpVerificationValidation,
   resetPasswordValidation,
   resetPasswordValidationWeb,
+  registerSchemaValidation,
 } = require("@/validation/auth.validation.js");
 
 const {
@@ -29,8 +30,27 @@ class AuthController {
   static register = async (req, res) => {
     try {
       const body = req.body;
+      const result = registerSchemaValidation.validate(body, {
+        abortEarly: false,
+      });
 
-      const checkExistingUser = await User.findOne({ email: body.email });
+      if (result.error) {
+        const errors = result.error.details.map((err) => ({
+          field: err.context.key,
+          message: err.message,
+        }));
+
+        return ApiResponse.errorResponse(
+          res,
+          "Validation failed",
+          errors,
+          StatusCodes.BAD_REQUEST
+        );
+      }
+
+      const data = result.value;
+
+      const checkExistingUser = await User.findOne({ email: data.email });
       if (checkExistingUser) {
         return ApiResponse.errorResponse(
           res,
@@ -40,15 +60,20 @@ class AuthController {
         );
       }
 
-      const hashedPassword = await bcrypt.hash(body.password, SALT_BCRYPT);
+      const hashedPassword = await bcrypt.hash(data.password, SALT_BCRYPT);
       const otp = generateOtp();
 
       const expiredOtp = dayjs().tz(getAppTimezone()).add(1, "days").toDate();
 
       const user = new User({
-        name: body.name,
-        email: body.email,
+        name: data.name,
+        email: data.email,
+        gender: data.gender,
+        phone: data.phone,
+        role: data.role,
+        username: data.username,
         password: hashedPassword,
+        birthDate: data.birthDate,
         otpVerification: otp,
         otpVerificationExpiresAt: expiredOtp, // expired in 1 day
       });
@@ -77,7 +102,7 @@ class AuthController {
         StatusCodes.CREATED
       );
     } catch (error) {
-      console.error(`[2025-07-02T07:13:20.312Z]`, error);
+      console.error(`error register user`, error);
       return ApiResponse.errorResponse(res, "Internal server error", {
         server: error.message,
       });

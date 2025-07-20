@@ -1,6 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 const ApiResponse = require("@/utils/response.js");
 const { Banner } = require("@/models/banner.model");
+const uploadToCloudinary = require("@/utils/uploadToCloudinary");
 class BannerController {
   static index = async (req, res) => {
     try {
@@ -22,23 +23,26 @@ class BannerController {
 
   static store = async (req, res) => {
     try {
-      const { url_image } = req.body;
-      if (!url_image) {
+      // validasi ada file
+      if (!req.file) {
         return ApiResponse.errorResponse(
           res,
-          "url_image is required",
-          null,
+          "File gambar wajib diupload",
+          {},
           StatusCodes.BAD_REQUEST
         );
       }
 
-      const banner = new Banner({ url_image });
-      await banner.save();
+      const imageUrl = await uploadToCloudinary({ buffer: req.file.buffer });
+
+      const create = await Banner.create({
+        url_image: imageUrl,
+      });
 
       return ApiResponse.successResponse(
         res,
-        "Banner created successfully",
-        banner,
+        "create banner successfully",
+        create,
         null,
         StatusCodes.CREATED
       );

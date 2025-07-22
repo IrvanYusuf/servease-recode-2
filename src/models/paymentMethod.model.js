@@ -3,10 +3,17 @@ const { Schema, model } = require("mongoose");
 const paymentMethodSchema = new Schema({
   name: {
     type: String,
+    required: true,
+  },
+  type: {
+    type: String,
     enum: ["cash", "bank_transfer"],
     required: true,
   },
   description: {
+    type: String,
+  },
+  bank_logo: {
     type: String,
   },
   bank_name: {
@@ -20,4 +27,6 @@ const paymentMethodSchema = new Schema({
   },
 });
 
-module.exports = model("PaymentMethod", paymentMethodSchema);
+const PaymentMethod = model("PaymentMethod", paymentMethodSchema);
+
+module.exports = { PaymentMethod };

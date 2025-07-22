@@ -24,6 +24,24 @@ class AddressController {
     }
   };
 
+  static getPrimaryAddress = async (req, res) => {
+    try {
+      const user_id = req.user.id;
+
+      const address = await Address.findOne({ user_id, isPrimary: true });
+      return ApiResponse.successResponse(
+        res,
+        "success get primary address",
+        address
+      );
+    } catch (error) {
+      console.error(error);
+      return ApiResponse.errorResponse(res, "Internal server error", {
+        server: error.message,
+      });
+    }
+  };
+
   static store = async (req, res) => {
     try {
       const body = req.body;

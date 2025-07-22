@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.post("/", authMiddleware, AddressController.store);
 router.get("/", authMiddleware, AddressController.index);
+router.get("/primary", authMiddleware, AddressController.getPrimaryAddress);
 router.patch(
   "/:address_id/set-primary",
   authMiddleware,

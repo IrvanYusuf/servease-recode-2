@@ -1,4 +1,6 @@
 const express = require("express");
+const reviewRoutes = require("./review.route.js");
+const bookingRoutes = require("./booking.route.js");
 const paymentmethodRoutes = require("./paymentmethod.route.js");
 const addressRoutes = require("./address.route.js");
 const partnerRoutes = require("./partner.route.js");
@@ -23,4 +25,6 @@ router.use("/videos", videoRoutes);
 router.use("/partners", partnerRoutes);
 router.use("/addresses", addressRoutes);
 router.use("/payment-methods", paymentmethodRoutes);
+router.use("/bookings", bookingRoutes);
+router.use("/reviews", reviewRoutes);
 module.exports = router;

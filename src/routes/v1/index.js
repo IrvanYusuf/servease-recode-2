@@ -11,6 +11,10 @@ const bannerRoutes = require("./banner.route.js");
 const authRoutes = require("./auth.route.js");
 const postRoutes = require("./post.route.js");
 const userRoutes = require("./user.routes.js");
+
+// partner dashboard
+const partnerDashboardRoutes = require("@/routes/v1/partner/index.js");
+
 const router = express.Router();
 
 router.use("/users", userRoutes);
@@ -27,4 +31,7 @@ router.use("/addresses", addressRoutes);
 router.use("/payment-methods", paymentmethodRoutes);
 router.use("/bookings", bookingRoutes);
 router.use("/reviews", reviewRoutes);
+
+// partner dashboard routes
+router.use("/dashboard/partners", partnerDashboardRoutes);
 module.exports = router;

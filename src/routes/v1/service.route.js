@@ -8,6 +8,7 @@ const router = express.Router();
 router.get("/", authMiddleware, ServiceController.index);
 router.get("/category/:category_id", ServiceController.findByCategory);
 router.get("/detail/:service_id", ServiceController.show);
+router.get("/reviews/:service_id", ServiceController.getServiceReview);
 
 router.post(
   "/",

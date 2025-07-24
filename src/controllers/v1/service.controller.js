@@ -6,6 +6,7 @@ const {
   uploadToCloudinary,
 } = require("@/utils/uploadToCloudinary");
 const { Service } = require("@/models/service.model");
+const { Review } = require("@/models/review.model");
 class ServiceController {
   static index = async (req, res) => {
     try {
@@ -115,6 +116,7 @@ class ServiceController {
         .populate("partner_id")
         .populate("user_id")
         .populate("category_id");
+
       if (!service) {
         return ApiResponse.errorResponse(
           res,
@@ -125,6 +127,35 @@ class ServiceController {
       }
 
       return ApiResponse.successResponse(res, "success get service", service);
+    } catch (error) {
+      console.error(error);
+      return ApiResponse.errorResponse(res, "Internal server error", {
+        server: error.message,
+      });
+    }
+  };
+
+  static getServiceReview = async (req, res) => {
+    try {
+      const service_id = req.params.service_id;
+      const service_reviews = await Review.findOne({ service_id }).populate(
+        "user_id"
+      );
+
+      if (!service_reviews) {
+        return ApiResponse.errorResponse(
+          res,
+          "Review service not found",
+          { data: "Review service not found" },
+          StatusCodes.NOT_FOUND
+        );
+      }
+
+      return ApiResponse.successResponse(
+        res,
+        "success get review service",
+        service_reviews
+      );
     } catch (error) {
       console.error(error);
       return ApiResponse.errorResponse(res, "Internal server error", {

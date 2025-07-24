@@ -17,6 +17,16 @@ const reviewSchema = new Schema(
       ref: "Partner",
       required: true,
     },
+    service_id: {
+      type: Schema.Types.ObjectId,
+      ref: "Service",
+      required: true,
+    },
+    owner_id: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
 
     rating: {
       type: Number,

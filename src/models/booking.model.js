@@ -17,6 +17,12 @@ const bookingSchema = new Schema(
       ref: "Partner",
       required: true,
     },
+    owner_id: {
+      type: Schema.Types.ObjectId,
+      ref: "User", // user role partner
+      required: true,
+    },
+
     address_id: {
       type: Schema.Types.ObjectId,
       ref: "Address",
@@ -71,7 +77,11 @@ const bookingSchema = new Schema(
       type: Boolean,
       required: true,
     },
-
+    review_status: {
+      type: String,
+      enum: ["not_reviewed", "reviewed"],
+      default: "not_reviewed",
+    },
     notes: {
       type: String,
     },

@@ -10,6 +10,9 @@ class BookingController {
     try {
       const user_id = req.user.id;
       const status = req.query.status || "";
+      const review_status = req.query.review_status || "";
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 4;
       const filter = { user_id };
 
       // Tambah filter status jika ada dan bukan 'all'
@@ -25,6 +28,17 @@ class BookingController {
           filter.status = status;
         }
       }
+
+      if (review_status) {
+        // Validasi status yang valid
+        const validStatusReviews = ["not_reviewed", "reviewed"];
+        if (validStatusReviews.includes(review_status)) {
+          filter.review_status = review_status;
+        }
+      }
+
+      const total = await Booking.countDocuments(filter);
+
       const bookings = await Booking.find(filter)
         .populate({
           path: "service_id",
@@ -36,11 +50,23 @@ class BookingController {
         .populate("partner_id")
         .populate("address_id")
         .populate("payment_method_id")
-        .sort({ createdAt: -1 });
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit);
+
+      const payload = {
+        data: bookings,
+        pagination: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
       return ApiResponse.successResponse(
         res,
         "success get bookings",
-        bookings,
+        payload,
         null,
         StatusCodes.OK
       );
@@ -51,6 +77,7 @@ class BookingController {
       });
     }
   };
+
   static show = async (req, res) => {
     try {
       const user_id = req.user.id;
@@ -62,6 +89,10 @@ class BookingController {
           populate: {
             path: "category_id",
             model: "Category",
+          },
+          populate: {
+            path: "user_id",
+            model: "User",
           },
         })
         .populate("partner_id")
@@ -79,6 +110,7 @@ class BookingController {
       });
     }
   };
+
   static store = async (req, res) => {
     try {
       const body = req.body;
@@ -107,6 +139,7 @@ class BookingController {
         user_id,
         address_id: data.address_id,
         partner_id: data.partner_id,
+        owner_id: data.owner_id,
         payment_method_id: data.payment_method_id,
         booking_date: data.booking_date,
         booking_time: data.booking_time,
@@ -114,6 +147,8 @@ class BookingController {
         service_id: service._id,
         notes: data.notes,
         total_price,
+        sub_total: service.price,
+        app_cost: APP_FEE,
         payment_due: paymentDue,
       });
       return ApiResponse.successResponse(
@@ -145,7 +180,7 @@ class BookingController {
           _id: booking_id,
           user_id,
         },
-        { payment_proof: paymentProofUrl }
+        { payment_proof: paymentProofUrl, payment_status: "paid" }
       );
       return ApiResponse.successResponse(
         res,

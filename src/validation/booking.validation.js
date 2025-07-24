@@ -9,6 +9,10 @@ const createBookingSchema = Joi.object({
     "string.empty": "Address id is required",
     "any.required": "Address id is required",
   }),
+  owner_id: Joi.string().required().messages({
+    "string.empty": "Owner id is required",
+    "any.required": "Owner id is required",
+  }),
   service_id: Joi.string().required().messages({
     "string.empty": "Service id is required",
     "any.required": "Service id is required",

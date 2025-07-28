@@ -5,6 +5,7 @@ const { Booking } = require("@/models/booking.model");
 const { Service } = require("@/models/service.model");
 const { APP_FEE } = require("@/constant/constant");
 const { uploadToCloudinary } = require("@/utils/uploadToCloudinary");
+const { TimelineTracker } = require("@/models/timelinetracker.model");
 class BookingController {
   static index = async (req, res) => {
     try {
@@ -98,10 +99,14 @@ class BookingController {
         .populate("partner_id")
         .populate("address_id")
         .populate("payment_method_id");
+
+      const timelinetracker = await TimelineTracker.findOne({ booking_id });
+
+      const payload = { booking, timelinetracker };
       return ApiResponse.successResponse(
         res,
         "success get detail booking",
-        booking
+        payload
       );
     } catch (error) {
       console.error(error);
@@ -151,6 +156,19 @@ class BookingController {
         app_cost: APP_FEE,
         payment_due: paymentDue,
       });
+
+      const createTimelineTracker = await TimelineTracker.create({
+        user_id,
+        booking_id: booking._id,
+        owner_id: data.owner_id,
+        partner_id: data.partner_id,
+        service_id: data.service_id,
+        tracker: {
+          booked_at: new Date(),
+        },
+        notes: "Booking dibuat",
+      });
+
       return ApiResponse.successResponse(
         res,
         "success create booking",
@@ -194,17 +212,23 @@ class BookingController {
       });
     }
   };
+
   static completeBooking = async (req, res) => {
     try {
       const { booking_id } = req.params;
-      const user_id = req.user.id;
+      // const user_id = req.user.id;
+      const paymentStatus = req.body.payment_status;
+      const params = { status: "completed" };
+
+      if (paymentStatus && paymentStatus.trim() !== "") {
+        params.payment_status = paymentStatus;
+      }
 
       const update_booking = await Booking.findOneAndUpdate(
         {
           _id: booking_id,
-          user_id,
         },
-        { status: "completed" }
+        params
       );
       return ApiResponse.successResponse(
         res,

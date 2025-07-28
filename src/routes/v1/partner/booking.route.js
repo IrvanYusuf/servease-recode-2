@@ -5,6 +5,13 @@ const express = require("express");
 const router = express.Router();
 
 router.get("/", authMiddleware, BookingController.index);
+router.get("/total-booking", authMiddleware, BookingController.getTotalBooking);
+router.get("/total-revenue", authMiddleware, BookingController.getTotalRevenue);
+router.get(
+  "/total-completed-booking",
+  authMiddleware,
+  BookingController.getTotalBookingCompleted
+);
 router.patch(
   "/confirm/:customer_id/:booking_id",
   authMiddleware,

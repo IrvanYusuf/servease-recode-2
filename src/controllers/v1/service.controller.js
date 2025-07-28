@@ -7,22 +7,34 @@ const {
 } = require("@/utils/uploadToCloudinary");
 const { Service } = require("@/models/service.model");
 const { Review } = require("@/models/review.model");
+const redisClient = require("@/config/redis");
+const { json } = require("express");
 class ServiceController {
   static index = async (req, res) => {
     try {
       const user_id = req.user.id;
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const filter = { user_id };
+      const total = await Service.countDocuments(filter);
 
-      const services = await Service.find({ user_id })
+      const services = await Service.find(filter)
         .populate("partner_id")
-        .populate("category_id");
+        .populate("category_id")
+        .skip((page - 1) * limit)
+        .limit(limit);
 
-      return ApiResponse.successResponse(
-        res,
-        "success get datas",
-        services,
-        null,
-        StatusCodes.CREATED
-      );
+      const payload = {
+        data: services,
+        pagination: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
+
+      return ApiResponse.successResponse(res, "success get datas", payload);
     } catch (error) {
       console.error(error);
       return ApiResponse.errorResponse(res, "Internal server error", {
@@ -89,18 +101,28 @@ class ServiceController {
   static findByCategory = async (req, res) => {
     try {
       const category_id = req.params.category_id;
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const filter = { category_id };
+      const total = await Service.countDocuments(filter);
 
-      const services = await Service.find({ category_id }).populate(
-        "partner_id"
-      );
+      const services = await Service.find(filter)
+        .populate("partner_id")
+        .populate("category_id")
+        .skip((page - 1) * limit)
+        .limit(limit);
 
-      return ApiResponse.successResponse(
-        res,
-        "success get datas",
-        services,
-        null,
-        StatusCodes.OK
-      );
+      const payload = {
+        data: services,
+        pagination: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
+
+      return ApiResponse.successResponse(res, "success get datas", payload);
     } catch (error) {
       console.error(error);
       return ApiResponse.errorResponse(res, "Internal server error", {
@@ -138,7 +160,7 @@ class ServiceController {
   static getServiceReview = async (req, res) => {
     try {
       const service_id = req.params.service_id;
-      const service_reviews = await Review.findOne({ service_id }).populate(
+      const service_reviews = await Review.find({ service_id }).populate(
         "user_id"
       );
 
@@ -155,6 +177,122 @@ class ServiceController {
         res,
         "success get review service",
         service_reviews
+      );
+    } catch (error) {
+      console.error(error);
+      return ApiResponse.errorResponse(res, "Internal server error", {
+        server: error.message,
+      });
+    }
+  };
+
+  static searchServices = async (req, res) => {
+    try {
+      const { keyword = "", page = 1, limit = 10 } = req.query;
+      const regex = new RegExp(keyword, "i"); // case-insensitive
+      const skip = (parseInt(page) - 1) * parseInt(limit);
+
+      const pipeline = [
+        {
+          $lookup: {
+            from: "categories", // nama collection Category
+            localField: "category_id",
+            foreignField: "_id",
+            as: "category",
+          },
+        },
+        {
+          $lookup: {
+            from: "partners",
+            localField: "partner_id",
+            foreignField: "_id",
+            as: "partner_id",
+          },
+        },
+        {
+          $unwind: {
+            path: "$category",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        { $unwind: { path: "$partner_id", preserveNullAndEmptyArrays: true } },
+        {
+          $match: {
+            $or: [
+              { name: { $regex: regex } },
+              { "category.name": { $regex: regex } },
+            ],
+          },
+        },
+        {
+          $facet: {
+            data: [{ $skip: skip }, { $limit: parseInt(limit) }],
+            totalCount: [{ $count: "count" }],
+          },
+        },
+      ];
+
+      const result = await Service.aggregate(pipeline);
+      const data = result[0]?.data || [];
+      const total = result[0]?.totalCount[0]?.count || 0;
+
+      const payload = {
+        data,
+        pagination: {
+          total,
+          page: parseInt(page),
+          limit,
+          totalPages: Math.ceil(total / limit),
+          keyword,
+        },
+      };
+
+      return ApiResponse.successResponse(
+        res,
+        "success get search data",
+        payload
+      );
+    } catch (error) {
+      console.error(error);
+      return ApiResponse.errorResponse(res, "Internal server error", {
+        server: error.message,
+      });
+    }
+  };
+
+  static getPopularServices = async (req, res) => {
+    try {
+      const cacheKey = "popular_services";
+      const cached = await redisClient.get(cacheKey);
+      const limit = parseInt(req.query.limit) || 10;
+      if (cached) {
+        console.log(
+          "🍕 Serving data popular services from Redis Cache with key:",
+          cacheKey
+        );
+        return ApiResponse.successResponse(
+          res,
+          "success get datas",
+          JSON.parse(cached)
+        );
+      }
+      // Ambil ID acak
+      const randomDocs = await Service.aggregate([
+        { $sample: { size: limit } },
+        { $project: { _id: 1 } },
+      ]);
+
+      const randomIds = randomDocs.map((doc) => doc._id);
+      const services = await Service.find({ _id: { $in: randomIds } })
+        .populate("partner_id")
+        .populate("category_id");
+
+      await redisClient.setEx(cacheKey, 1800, JSON.stringify(services));
+
+      return ApiResponse.successResponse(
+        res,
+        "success get popular services",
+        services
       );
     } catch (error) {
       console.error(error);

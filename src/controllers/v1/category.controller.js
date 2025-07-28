@@ -72,6 +72,23 @@ class CategoryController {
       });
     }
   };
+
+  static show = async (req, res) => {
+    try {
+      const { categoryId } = req.params;
+      const category = await Category.findById(categoryId);
+      return ApiResponse.successResponse(
+        res,
+        "success get detail category",
+        category
+      );
+    } catch (error) {
+      console.error(error);
+      return ApiResponse.errorResponse(res, "Internal server error", {
+        server: error.message,
+      });
+    }
+  };
 }
 
 module.exports = CategoryController;

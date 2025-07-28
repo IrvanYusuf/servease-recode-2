@@ -66,6 +66,19 @@ class ReviewController {
         { review_status: "reviewed" }
       );
 
+      // Hitung total rating dan review untuk service terkait
+      const allReviews = await Review.find({ service_id: data.service_id });
+
+      const totalRating = allReviews.reduce((sum, r) => sum + r.rating, 0);
+      const totalReviews = allReviews.length;
+      const averageRating = totalRating / totalReviews;
+
+      // Update rating dan total_reviews di Service
+      await Service.findByIdAndUpdate(data.service_id, {
+        rating: averageRating.toFixed(1), // jika ingin 1 angka desimal
+        total_reviews: totalReviews,
+      });
+
       // LOGIC APP
       return ApiResponse.successResponse(
         res,

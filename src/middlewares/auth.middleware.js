@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const ApiResponse = require("@/utils/response.js");
-const { CONFIG } = require("../config/index.js");
+const { CONFIG } = require("@/config/index.js");
 const { StatusCodes } = require("http-status-codes");
 
 const authMiddleware = (req, res, next) => {

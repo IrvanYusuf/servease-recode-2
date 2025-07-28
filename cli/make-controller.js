@@ -155,7 +155,7 @@ class ${className} {
       // IMPLEMENT VALIDATION HERE
 
       // LOGIC APP
-      return ApiResponse.successResponse(res,"success get datas",data,null,StatusCodes.CREATED);
+      return ApiResponse.successResponse(res,"success get datas",data,null,StatusCodes.OK);
     } catch (error) {
       console.error(error);
       return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});
@@ -179,7 +179,7 @@ class ${className} {
       // IMPLEMENT VALIDATION HERE
 
       // LOGIC APP
-      return ApiResponse.successResponse(res,"success get detail",data,null,StatusCodes.CREATED);
+      return ApiResponse.successResponse(res,"success get detail",data,null,StatusCodes.OK);
     } catch (error) {
       console.error(error);
       return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});
@@ -191,7 +191,7 @@ class ${className} {
       // IMPLEMENT VALIDATION HERE
 
       // LOGIC APP
-      return ApiResponse.successResponse(res,"success delete",data,null,StatusCodes.CREATED);
+      return ApiResponse.successResponse(res,"success delete",data,null,StatusCodes.OK);
     } catch (error) {
       console.error(error);
       return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});
@@ -209,7 +209,7 @@ const index = async (req, res) => {
     // IMPLEMENT VALIDATION HERE
 
     // LOGIC APP
-    return ApiResponse.successResponse(res,"success get datas",data,null,StatusCodes.CREATED);
+    return ApiResponse.successResponse(res,"success get datas",data,null,StatusCodes.OK);
   } catch (error) {
     console.error(error);
     return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});
@@ -233,7 +233,7 @@ const show = async (req, res) => {
       // IMPLEMENT VALIDATION HERE
 
       // LOGIC APP
-      return ApiResponse.successResponse(res,"success get detail",data,null,StatusCodes.CREATED);
+      return ApiResponse.successResponse(res,"success get detail",data,null,StatusCodes.OK);
     } catch (error) {
       console.error(error);
       return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});
@@ -245,7 +245,7 @@ const destroy = async (req, res) => {
       // IMPLEMENT VALIDATION HERE
 
       // LOGIC APP
-      return ApiResponse.successResponse(res,"success delete",data,null,StatusCodes.CREATED);
+      return ApiResponse.successResponse(res,"success delete",data,null,StatusCodes.OK);
     } catch (error) {
       console.error(error);
       return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});
@@ -268,7 +268,7 @@ class ${className} {
       // IMPLEMENT VALIDATION HERE
 
       // LOGIC APP
-      return ApiResponse.successResponse(res,"success get datas",data,null,StatusCodes.CREATED);
+      return ApiResponse.successResponse(res,"success get datas",data,null,StatusCodes.OK);
     } catch (error) {
       console.error(error);
       return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});
@@ -287,7 +287,7 @@ const index = async (req, res) => {
     // IMPLEMENT VALIDATION HERE
 
     // LOGIC APP
-    return ApiResponse.successResponse(res,"success",data,null,StatusCodes.CREATED);
+    return ApiResponse.successResponse(res,"success",data,null,StatusCodes.OK);
   } catch (error) {
     console.error(error);
     return ApiResponse.errorResponse(res, "Internal server error", { server: error.message});

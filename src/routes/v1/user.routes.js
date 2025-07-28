@@ -11,7 +11,7 @@ router.post("/", UserController.createNewUser);
 router.get("/", UserController.getUsers);
 
 // find user by id
-router.get("/:id", UserController.findUserById);
+router.get("/detail", authMiddleware, UserController.findUserById);
 
 // update user by id
 router.patch("/:id", UserController.updateUser);

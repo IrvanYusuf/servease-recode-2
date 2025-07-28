@@ -39,9 +39,9 @@ class UserController {
 
   static findUserById = async (req, res) => {
     try {
-      const userId = req.params.id;
+      const user_id = req.user.id;
 
-      const user = await User.findById(userId).select("-password");
+      const user = await User.findById(user_id).select("-password");
       if (!user) {
         return ApiResponse.errorResponse(
           res,

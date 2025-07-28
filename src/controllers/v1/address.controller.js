@@ -12,9 +12,7 @@ class AddressController {
       return ApiResponse.successResponse(
         res,
         "success get addresses",
-        addresses,
-        null,
-        StatusCodes.CREATED
+        addresses
       );
     } catch (error) {
       console.error(error);

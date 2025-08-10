@@ -1,4 +1,4 @@
-require("module-alias/register");
+require("./alias.js");
 const express = require("express");
 const morgan = require("morgan");
 const connectDb = require("@/database/db.js");

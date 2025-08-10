@@ -9,6 +9,7 @@ const router = express.Router();
 router.use(authMiddleware);
 router.get("/earning-history", EarningController.getEarningsHistory);
 router.get("/withdraw-history", EarningController.getWithdrawHistory);
+router.get("/balance", EarningController.getUserBalance);
 router.get(
   "/total-monthly-withdraw",
   EarningController.getTotalMonthlyWithdraw

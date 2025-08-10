@@ -147,10 +147,27 @@ class EarningController {
       },
     ]);
     const totalMonthlyWithdraw = monthlyWithdraw[0]?.totalRevenue || 0;
+
     return ApiResponse.successResponse(
       res,
       "Success get monthly withdraw",
       totalMonthlyWithdraw
+    );
+  };
+
+  static getUserBalance = async (req, res) => {
+    const owner_id = req.user.id;
+
+    const user = await User.findById(owner_id);
+    if (!user) {
+      return next(new ApiError("User not found", StatusCodes.NOT_FOUND));
+    }
+
+    const balance = user.balance || 0;
+    return ApiResponse.successResponse(
+      res,
+      "Success get user balance",
+      balance
     );
   };
 }

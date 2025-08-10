@@ -1,29 +1,73 @@
 const express = require("express");
 const AuthController = require("@/controllers/v1/auth.controller.js");
 const authMiddleware = require("@/middlewares/auth.middleware.js");
+const validateMiddleware = require("@/middlewares/validate.middleware");
+const {
+  registerSchemaValidation,
+  loginSchemaValidation,
+  otpVerificationValidation,
+  changePasswordValidation,
+  forgotPasswordValidation,
+  resetPasswordValidation,
+  resetPasswordValidationWeb,
+} = require("@/validation/auth.validation");
 const router = express.Router();
 
-router.post("/register", AuthController.register);
-router.post("/login", AuthController.login);
+router.post(
+  "/register",
+  validateMiddleware(registerSchemaValidation),
+  AuthController.register
+);
+router.post(
+  "/login",
+  validateMiddleware(loginSchemaValidation),
+  AuthController.login
+);
 router.post("/logout", authMiddleware, AuthController.logout);
-router.post("/verify-otp-account", AuthController.verifyOtp);
-router.post("/change-password", authMiddleware, AuthController.changePassword);
+router.post(
+  "/verify-otp-account",
+  validateMiddleware(otpVerificationValidation),
+  AuthController.verifyOtp
+);
+router.post(
+  "/change-password",
+  authMiddleware,
+  validateMiddleware(changePasswordValidation),
+  AuthController.changePassword
+);
 
 // forgot password mobile device
-router.post("/forgot-password-mobile", AuthController.forgotPasswordMobile);
+router.post(
+  "/forgot-password-mobile",
+  validateMiddleware(forgotPasswordValidation),
+  AuthController.forgotPasswordMobile
+);
 
 // forgot password web
-router.post("/forgot-password-web", AuthController.forgotPasswordWeb);
+router.post(
+  "/forgot-password-web",
+  validateMiddleware(forgotPasswordValidation),
+  AuthController.forgotPasswordWeb
+);
 
 // reset password mobile
-router.post("/reset-password-mobile", AuthController.resetPasswordMobile);
+router.post(
+  "/reset-password-mobile",
+  validateMiddleware(resetPasswordValidation),
+  AuthController.resetPasswordMobile
+);
 
 // reset password web
-router.post("/reset-password-web", AuthController.resetPasswordWeb);
+router.post(
+  "/reset-password-web",
+  validateMiddleware(resetPasswordValidationWeb),
+  AuthController.resetPasswordWeb
+);
 
 // verify otp forgot password mobile
 router.post(
   "/verify-otp-forgot-password",
+  validateMiddleware(otpVerificationValidation),
   AuthController.verifyForgotPasswordOtp
 );
 

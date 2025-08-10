@@ -18,9 +18,12 @@ const authMiddleware = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, CONFIG.JWT_SECRET_KEY);
-    req.user = decoded; // simpan payload token ke req.user
+    req.user = decoded; // simpan payload decoded token ke req.user
+    req.token = token;
     next();
   } catch (err) {
+    console.log(err);
+
     return ApiResponse.errorResponse(
       res,
       "Forbidden or expired token",

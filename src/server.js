@@ -1,3 +1,5 @@
+require("./alias.js");
+
 const app = require("./app.js");
 const { CONFIG } = require("@/config/index.js");
 

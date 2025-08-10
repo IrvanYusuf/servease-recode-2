@@ -4,17 +4,34 @@ const express = require("express");
 
 const router = express.Router();
 
-router.get("/", authMiddleware, BookingController.index);
-router.get("/total-booking", authMiddleware, BookingController.getTotalBooking);
-router.get("/total-revenue", authMiddleware, BookingController.getTotalRevenue);
+// private routes
+router.use(authMiddleware);
+router.get("/", BookingController.index);
+router.get("/total-booking", BookingController.getTotalBooking);
+router.get("/total-revenue", BookingController.getTotalRevenue);
+router.get("/total-revenue-pending", BookingController.getTotalRevenuePending);
+router.get("/total-monthly-revenue", BookingController.getMonthlyRevenue);
 router.get(
   "/total-completed-booking",
-  authMiddleware,
   BookingController.getTotalBookingCompleted
 );
+router.get(
+  "/total-completed-booking-user/:user_id",
+  BookingController.getTotalBookingCompleted
+);
+
+router.get("/total-pending-booking", BookingController.getTotalBookingPending);
+router.get(
+  "/total-confirmed-booking",
+  BookingController.getTotalBookingOnGoing
+);
+router.get(
+  "/total-cancelled-booking",
+  BookingController.getTotalBookingCancelled
+);
+
 router.patch(
   "/confirm/:customer_id/:booking_id",
-  authMiddleware,
   BookingController.confirmBooking
 );
 module.exports = router;

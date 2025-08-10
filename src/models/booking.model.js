@@ -89,6 +89,16 @@ const bookingSchema = new Schema(
   { timestamps: true }
 );
 
+bookingSchema.virtual("review_id", {
+  ref: "Review",
+  localField: "_id",
+  foreignField: "booking_id",
+  justOne: true,
+});
+
+bookingSchema.set("toObject", { virtuals: true });
+bookingSchema.set("toJSON", { virtuals: true });
+
 const Booking = model("Booking", bookingSchema);
 
 module.exports = { Booking };

@@ -1,11 +1,13 @@
 const { StatusCodes } = require("http-status-codes");
 const ApiResponse = require("@/utils/response.js");
-const { createBookingSchema } = require("@/validation/booking.validation");
 const { Booking } = require("@/models/booking.model");
 const { Service } = require("@/models/service.model");
 const { APP_FEE } = require("@/constant/constant");
 const { uploadToCloudinary } = require("@/utils/uploadToCloudinary");
 const { TimelineTracker } = require("@/models/timelinetracker.model");
+const ApiError = require("@/errors/apiError");
+const { PaymentMethod } = require("@/models/paymentMethod.model");
+const { User } = require("@/models/user.model");
 class BookingController {
   static index = async (req, res) => {
     try {
@@ -43,10 +45,16 @@ class BookingController {
       const bookings = await Booking.find(filter)
         .populate({
           path: "service_id",
-          populate: {
-            path: "category_id",
-            model: "Category",
-          },
+          populate: [
+            {
+              path: "category_id",
+              model: "Category",
+            },
+            {
+              path: "user_id",
+              model: "User",
+            },
+          ],
         })
         .populate("partner_id")
         .populate("address_id")
@@ -79,168 +87,247 @@ class BookingController {
     }
   };
 
-  static show = async (req, res) => {
-    try {
-      const user_id = req.user.id;
-      const { booking_id } = req.params;
-      const booking = await Booking.findOne({ _id: booking_id, user_id })
-        .populate("user_id")
-        .populate({
-          path: "service_id",
-          populate: {
+  static show = async (req, res, next) => {
+    const { booking_id } = req.params;
+    const booking = await Booking.findOne({ _id: booking_id })
+      .populate("user_id")
+      .populate({
+        path: "service_id",
+        populate: [
+          {
             path: "category_id",
             model: "Category",
           },
-          populate: {
+          {
             path: "user_id",
             model: "User",
           },
-        })
-        .populate("partner_id")
-        .populate("address_id")
-        .populate("payment_method_id");
+        ],
+      })
+      .populate("partner_id")
+      .populate("address_id")
+      .populate("payment_method_id");
 
-      const timelinetracker = await TimelineTracker.findOne({ booking_id });
-
-      const payload = { booking, timelinetracker };
-      return ApiResponse.successResponse(
-        res,
-        "success get detail booking",
-        payload
-      );
-    } catch (error) {
-      console.error(error);
-      return ApiResponse.errorResponse(res, "Internal server error", {
-        server: error.message,
-      });
+    if (!booking) {
+      return next(new ApiError("Booking not found", StatusCodes.NOT_FOUND));
     }
+
+    const timelinetracker = await TimelineTracker.findOne({ booking_id });
+
+    const payload = booking
+      ? { ...booking.toObject(), timelinetracker }
+      : { timelinetracker };
+
+    return ApiResponse.successResponse(
+      res,
+      "success get detail booking",
+      payload
+    );
   };
 
-  static store = async (req, res) => {
-    try {
-      const body = req.body;
-      const result = createBookingSchema.validate(body, { abortEarly: false });
-      if (result.error) {
-        const errors = result.error.details.map((err) => ({
-          field: err.context.key,
-          message: err.message,
-        }));
+  static store = async (req, res, next) => {
+    const data = req.validated;
+    const service = await Service.findById(data.service_id);
 
-        return ApiResponse.errorResponse(
-          res,
-          "Validation failed",
-          errors,
-          StatusCodes.BAD_REQUEST
-        );
-      }
-      const data = result.value;
-      const service = await Service.findById(data.service_id);
-      const user_id = req.user.id;
-      const total_price = service.price + APP_FEE;
-
-      const paymentDue = new Date();
-      paymentDue.setHours(paymentDue.getHours() + 24);
-      const booking = await Booking.create({
-        user_id,
-        address_id: data.address_id,
-        partner_id: data.partner_id,
-        owner_id: data.owner_id,
-        payment_method_id: data.payment_method_id,
-        booking_date: data.booking_date,
-        booking_time: data.booking_time,
-        bring_ladder: data.bring_ladder,
-        service_id: service._id,
-        notes: data.notes,
-        total_price,
-        sub_total: service.price,
-        app_cost: APP_FEE,
-        payment_due: paymentDue,
-      });
-
-      const createTimelineTracker = await TimelineTracker.create({
-        user_id,
-        booking_id: booking._id,
-        owner_id: data.owner_id,
-        partner_id: data.partner_id,
-        service_id: data.service_id,
-        tracker: {
-          booked_at: new Date(),
-        },
-        notes: "Booking dibuat",
-      });
-
-      return ApiResponse.successResponse(
-        res,
-        "success create booking",
-        booking,
-        null,
-        StatusCodes.CREATED
-      );
-    } catch (error) {
-      console.error(error);
-      return ApiResponse.errorResponse(res, "Internal server error", {
-        server: error.message,
-      });
+    if (!service) {
+      return next(new ApiError("Service not found", StatusCodes.NOT_FOUND));
     }
+
+    const user_id = req.user.id;
+    const total_price = service.price + APP_FEE;
+
+    const paymentDue = new Date();
+    paymentDue.setHours(paymentDue.getHours() + 24);
+    const booking = await Booking.create({
+      user_id,
+      address_id: data.address_id,
+      partner_id: data.partner_id,
+      owner_id: data.owner_id,
+      payment_method_id: data.payment_method_id,
+      booking_date: data.booking_date,
+      booking_time: data.booking_time,
+      bring_ladder: data.bring_ladder,
+      service_id: service._id,
+      notes: data.notes,
+      total_price,
+      sub_total: service.price,
+      app_cost: APP_FEE,
+      payment_due: paymentDue,
+    });
+
+    const createTimelineTracker = await TimelineTracker.create({
+      user_id,
+      booking_id: booking._id,
+      owner_id: data.owner_id,
+      partner_id: data.partner_id,
+      service_id: data.service_id,
+      tracker: {
+        booked_at: new Date(),
+      },
+      notes: "Booking dibuat",
+    });
+
+    return ApiResponse.successResponse(
+      res,
+      "success create booking",
+      booking,
+      null,
+      StatusCodes.CREATED
+    );
   };
 
   static uploadPaymentProof = async (req, res) => {
-    try {
-      const { booking_id } = req.params;
-      const user_id = req.user.id;
+    const { booking_id } = req.params;
+    const user_id = req.user.id;
 
-      const paymentProofUrl = await uploadToCloudinary({
-        buffer: req.file.buffer,
-      });
+    const paymentProofUrl = await uploadToCloudinary({
+      buffer: req.file.buffer,
+    });
 
-      const update_booking = await Booking.findOneAndUpdate(
-        {
-          _id: booking_id,
-          user_id,
+    const update_booking = await Booking.findOneAndUpdate(
+      {
+        _id: booking_id,
+        user_id,
+      },
+      { payment_proof: paymentProofUrl, payment_status: "paid" }
+    );
+
+    await TimelineTracker.findOneAndUpdate(
+      {
+        owner_id: update_booking.owner_id,
+        booking_id,
+      },
+      {
+        $set: {
+          "tracker.payment_at": new Date(),
+          status: "payment",
+          notes: "Melakukan Pembayaran",
         },
-        { payment_proof: paymentProofUrl, payment_status: "paid" }
-      );
-      return ApiResponse.successResponse(
-        res,
-        "success upload payment proof",
-        update_booking
-      );
-    } catch (error) {
-      console.error(error);
-      return ApiResponse.errorResponse(res, "Internal server error", {
-        server: error.message,
-      });
-    }
+      }
+    );
+    return ApiResponse.successResponse(
+      res,
+      "success upload payment proof",
+      update_booking
+    );
   };
 
   static completeBooking = async (req, res) => {
-    try {
-      const { booking_id } = req.params;
-      // const user_id = req.user.id;
-      const paymentStatus = req.body.payment_status;
-      const params = { status: "completed" };
+    const { booking_id } = req.params;
+    // const user_id = req.user.id;
+    const paymentStatus = req.body.payment_status;
+    const params = { status: "completed" };
 
-      if (paymentStatus && paymentStatus.trim() !== "") {
-        params.payment_status = paymentStatus;
-      }
-
-      const update_booking = await Booking.findOneAndUpdate(
-        {
-          _id: booking_id,
-        },
-        params
-      );
-      return ApiResponse.successResponse(
-        res,
-        "Booking marked as completed successfully",
-        update_booking
-      );
-    } catch (error) {
-      console.error(error);
-      return ApiResponse.errorResponse(res, "Internal server error", {
-        server: error.message,
-      });
+    if (paymentStatus && paymentStatus.trim() !== "") {
+      params.payment_status = paymentStatus;
     }
+
+    const update_booking = await Booking.findOneAndUpdate(
+      {
+        _id: booking_id,
+      },
+      params
+    );
+
+    const { payment_method_id, service_id, owner_id } = update_booking;
+    const paymentMethodName = await PaymentMethod.findById(payment_method_id);
+    // Payload dasar
+    const trackerUpdate = {
+      "tracker.completed_at": new Date(),
+      status: "completed",
+      notes: "Booking selesai",
+    };
+
+    // Jika cash, tambahkan payment_at
+    if (paymentMethodName.type === "cash") {
+      trackerUpdate["tracker.payment_at"] = new Date();
+    }
+
+    // Update ke TimelineTracker
+    await TimelineTracker.findOneAndUpdate(
+      {
+        owner_id: owner_id,
+        booking_id,
+      },
+      {
+        $set: trackerUpdate,
+      }
+    );
+
+    const service = await Service.findById(service_id);
+    const user = await User.findById(owner_id);
+
+    console.log({ user, balance: user.balance, price: service.price });
+
+    user.balance =
+      Number(user.balance ? user.balance : 0) + Number(service.price);
+    await user.save();
+    return ApiResponse.successResponse(
+      res,
+      "Booking marked as completed successfully",
+      update_booking
+    );
+  };
+
+  static getTotalBooking = async (req, res) => {
+    const user_id = req.user.id;
+    const range_date = req.query.range_date || "all";
+
+    const params = {
+      user_id,
+    };
+
+    if (range_date === "today") {
+      const todayStart = moment().utc().startOf("day").toDate();
+      const todayEnd = moment().utc().endOf("day").toDate();
+
+      params.createdAt = { $gte: todayStart, $lte: todayEnd };
+    } else if (range_date === "week") {
+      const weekStart = moment()
+        .utc()
+        .subtract(7, "days")
+        .startOf("day")
+        .toDate();
+      const now = moment().utc().endOf("day").toDate();
+
+      params.createdAt = { $gte: weekStart, $lte: now };
+    }
+
+    const totalBookings = await Booking.countDocuments(params);
+
+    return ApiResponse.successResponse(
+      res,
+      "Success get total completed bookings",
+      totalBookings
+    );
+  };
+
+  static getTotalBookingCompleted = async (req, res) => {
+    const user_id = req.user.id;
+    const totalCompletedBooking = await Booking.countDocuments({
+      user_id,
+      status: "completed",
+    });
+
+    return ApiResponse.successResponse(
+      res,
+      "success get total completed booking",
+      totalCompletedBooking
+    );
+  };
+
+  static getTotalBookingNotReviewed = async (req, res) => {
+    const user_id = req.user.id;
+    const totalNotReviewedBooking = await Booking.countDocuments({
+      user_id,
+      status: "completed",
+      review_status: "not_reviewed",
+    });
+    return ApiResponse.successResponse(
+      res,
+      "success get total not reviewed booking",
+      totalNotReviewedBooking
+    );
   };
 }
 

@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "babel-node api/app.js",
-    "dev": "nodemon --exec babel-node api/app.js",
+    "start": "node src/server.js",
+    "dev": "nodemon --exec src/server.js",
     "make:controller": "node cli/make-controller.js",
     "make:route": "node cli/make-route.js",
     "make:middleware": "node cli/make-middleware.js",

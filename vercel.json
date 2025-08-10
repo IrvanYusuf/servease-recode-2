@@ -1,8 +1,16 @@
 {
-  "functions": {
-    "api/app.js": {
-      "runtime": "@vercel/node"
+  "version": 2,
+  "builds": [
+    {
+      "src": "src/server.js",
+      "use": "@vercel/node",
+      "config": { "includeFiles": ["dist/"] }
     }
-  },
-  "rewrites": [{ "source": "api/(.*)", "destination": "api/app.js" }]
+  ],
+  "routes": [
+    {
+      "src": "src/(.*)",
+      "dest": "src/server.js"
+    }
+  ]
 }

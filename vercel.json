@@ -1,8 +1,16 @@
 {
-  "functions": {
-    "src/server.js": {
-      "runtime": "@vercel/node"
+  "version": 2,
+  "builds": [
+    {
+      "src": "/src/server.js",
+      "use": "@vercel/node",
+      "config": { "includeFiles": ["dist/**"] }
     }
-  },
-  "rewrites": [{ "source": "/(.*)", "destination": "/src/server.js" }]
+  ],
+  "routes": [
+    {
+      "src": "/src(.*)",
+      "dest": "/src/server.js"
+    }
+  ]
 }

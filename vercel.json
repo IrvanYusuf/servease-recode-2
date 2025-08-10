@@ -1,9 +1,8 @@
 {
   "functions": {
-    "dist/app.js": {
-      "runtime": "@vercel/node"
+    "app.js": {
+      "runtime": "@vercel/node@2.7.0"
     }
   },
-  "rewrites": [{ "source": "/(.*)", "destination": "/dist/app.js" }],
-  "buildCommand": "npm run build"
+  "rewrites": [{ "source": "/(.*)", "destination": "app.js" }]
 }

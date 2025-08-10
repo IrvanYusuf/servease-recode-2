@@ -26,4 +26,18 @@ const createReviewSchema = Joi.object({
   }),
 });
 
-module.exports = { createReviewSchema };
+const updateReviewSchema = Joi.object({
+  rating: Joi.number().min(1).max(5).required().messages({
+    "number.base": "Rating must be a number",
+    "number.min": "Minimum rating is 1",
+    "number.max": "Maximum rating is 5",
+    "any.required": "Rating is required",
+  }),
+
+  comment: Joi.string().required().messages({
+    "string.empty": "comment id is required",
+    "any.required": "comment id is required",
+  }),
+});
+
+module.exports = { createReviewSchema, updateReviewSchema };

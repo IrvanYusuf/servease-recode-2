@@ -4,6 +4,10 @@ const express = require("express");
 
 const router = express.Router();
 
-router.get("/", authMiddleware, ReviewController.index);
+// private routes
+router.use(authMiddleware);
+router.get("/", ReviewController.index);
+router.get("/total-not-reviewed", ReviewController.getTotalBookingNotReviewed);
+router.get("/total-all-review", ReviewController.getTotalBookingReview);
 
 module.exports = router;

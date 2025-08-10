@@ -40,6 +40,10 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    balance: {
+      type: Number,
+      default: 0,
+    },
     profile_url: String,
     otpVerification: String,
     otpVerificationExpiresAt: Date,

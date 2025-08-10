@@ -31,6 +31,7 @@ const addressSchema = new Schema(
       type: String,
       required: true,
     },
+    link_map: String,
     description: {
       type: String,
     },

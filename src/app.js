@@ -25,4 +25,12 @@ app.get("/", (req, res) => {
 // app.use(errorHandler);
 // app.use(multerErrorHandler);
 
+const PORT = process.env.PORT || 3300;
+
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
+
 module.exports = app;

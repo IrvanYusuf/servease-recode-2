@@ -5,5 +5,5 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["src", "src/api/app.js"]
+  "include": ["src", "api/app.js"]
 }

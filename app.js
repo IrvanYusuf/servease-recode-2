@@ -1,11 +1,11 @@
 const express = require("express");
 const morgan = require("morgan");
 const connectDb = require("./src/database/db.js");
-// const apiEndpoints = require("./src/routes/index.js");
+const apiEndpoints = require("./src/routes/index.js");
 const cors = require("cors");
 // const multerErrorHandler = require("./src/errors/multerError.js");
 // const errorHandler = require("./src/errors/errorHandler.js");
-// const { CONFIG } = require("./src/config/index.js");
+const { CONFIG } = require("./src/config/index.js");
 
 // dotenv.config();
 
@@ -21,11 +21,11 @@ connectDb();
 app.get("/", (req, res) => {
   res.send("halo");
 });
-// app.use("/api", apiEndpoints);
+app.use("/api", apiEndpoints);
 // app.use(errorHandler);
 // app.use(multerErrorHandler);
 
-const PORT = process.env.PORT || 3300;
+const PORT = CONFIG.PORT || 3300;
 
 if (process.env.NODE_ENV !== "production") {
   app.listen(PORT, () => {

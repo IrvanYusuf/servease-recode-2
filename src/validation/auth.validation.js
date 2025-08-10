@@ -34,6 +34,25 @@ const registerSchemaValidation = Joi.object({
   }),
 });
 
+const updateUserSchemaValidation = Joi.object({
+  name: Joi.string().min(3).optional().messages({
+    "string.min": "Name too short",
+  }),
+  email: Joi.string().email().optional().messages({
+    "string.email": "Email must be a valid email address",
+  }),
+  phone: Joi.string().min(12).max(15).optional().messages({
+    "string.min": "Phone number must be at least 12 digits",
+    "string.max": "Phone number max 15 digits",
+  }),
+  gender: Joi.string().valid("MALE", "FEMALE").optional().messages({
+    "any.only": "Gender must be either MALE or FEMALE",
+  }),
+  birthDate: Joi.date().optional().messages({
+    "date.base": "Birth date must be a valid date",
+  }),
+});
+
 const loginSchemaValidation = Joi.object({
   email: Joi.string().email().required().messages({
     "string.empty": "Email is required",
@@ -104,4 +123,5 @@ module.exports = {
   resetPasswordValidation,
   resetPasswordValidationWeb,
   registerSchemaValidation,
+  updateUserSchemaValidation,
 };

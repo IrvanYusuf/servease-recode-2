@@ -1,12 +1,12 @@
 require("./src/alias.js");
 const express = require("express");
 const morgan = require("morgan");
-const connectDb = require("@/database/db.js");
-const apiEndpoints = require("@/routes/index.js");
+const connectDb = require("./src/database/db.js");
+const apiEndpoints = require("./src/routes/index.js");
 const cors = require("cors");
-const multerErrorHandler = require("@/errors/multerError.js");
-const errorHandler = require("@/errors/errorHandler");
-const { CONFIG } = require("@/config/index.js");
+const multerErrorHandler = require("./src/errors/multerError.js");
+const errorHandler = require("./src/errors/errorHandler.js");
+const { CONFIG } = require("./src/config/index.js");
 
 // dotenv.config();
 

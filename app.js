@@ -1,6 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
-const connectDb = require("./database/db.js");
+const connectDb = require("./src/database/db.js");
 // const apiEndpoints = require("./src/routes/index.js");
 const cors = require("cors");
 // const multerErrorHandler = require("./src/errors/multerError.js");

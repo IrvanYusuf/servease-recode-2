@@ -5,69 +5,45 @@ const uploadToCloudinary = require("@/utils/uploadToCloudinary");
 const redisClient = require("@/config/redis");
 class BannerController {
   static index = async (req, res) => {
-    try {
-      const cacheKey = "banners";
-      const cached = await redisClient.get(cacheKey);
-      if (cached) {
-        console.log(
-          "🍕 Serving data banners from Redis Cache with key:",
-          cacheKey
-        );
-        return ApiResponse.successResponse(
-          res,
-          "success get datas",
-          JSON.parse(cached),
-          null,
-          StatusCodes.OK
-        );
-      }
-      const banners = await Banner.find().sort({ createdAt: -1 });
+    const cacheKey = "banners";
+    const cached = await redisClient.get(cacheKey);
+    if (cached) {
+      console.log(
+        "🍕 Serving data banners from Redis Cache with key:",
+        cacheKey
+      );
       return ApiResponse.successResponse(
         res,
         "success get datas",
-        banners,
+        JSON.parse(cached),
         null,
-        StatusCodes.CREATED
+        StatusCodes.OK
       );
-    } catch (error) {
-      console.error(error);
-      return ApiResponse.errorResponse(res, "Internal server error", {
-        server: error.message,
-      });
     }
+    const banners = await Banner.find().sort({ createdAt: -1 });
+    return ApiResponse.successResponse(
+      res,
+      "success get datas",
+      banners,
+      null,
+      StatusCodes.CREATED
+    );
   };
 
   static store = async (req, res) => {
-    try {
-      // validasi ada file
-      if (!req.file) {
-        return ApiResponse.errorResponse(
-          res,
-          "File gambar wajib diupload",
-          {},
-          StatusCodes.BAD_REQUEST
-        );
-      }
+    const imageUrl = await uploadToCloudinary({ buffer: req.file.buffer });
 
-      const imageUrl = await uploadToCloudinary({ buffer: req.file.buffer });
+    const create = await Banner.create({
+      url_image: imageUrl,
+    });
 
-      const create = await Banner.create({
-        url_image: imageUrl,
-      });
-
-      return ApiResponse.successResponse(
-        res,
-        "create banner successfully",
-        create,
-        null,
-        StatusCodes.CREATED
-      );
-    } catch (error) {
-      console.error(error);
-      return ApiResponse.errorResponse(res, "Internal server error", {
-        server: error.message,
-      });
-    }
+    return ApiResponse.successResponse(
+      res,
+      "create banner successfully",
+      create,
+      null,
+      StatusCodes.CREATED
+    );
   };
 }
 

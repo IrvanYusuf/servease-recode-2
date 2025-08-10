@@ -1,7 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
 const connectDb = require("./src/database/db.js");
-const apiEndpoints = require("./src/routes/index.js");
+// const apiEndpoints = require("./src/routes/index.js");
 const cors = require("cors");
 // const multerErrorHandler = require("./src/errors/multerError.js");
 // const errorHandler = require("./src/errors/errorHandler.js");
@@ -25,7 +25,7 @@ app.use("/api", apiEndpoints);
 // app.use(errorHandler);
 // app.use(multerErrorHandler);
 
-const PORT = CONFIG.PORT || 3300;
+const PORT = process.env.PORT || 3300;
 
 if (process.env.NODE_ENV !== "production") {
   app.listen(PORT, () => {

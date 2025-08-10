@@ -21,7 +21,7 @@ connectDb();
 app.get("/", (req, res) => {
   res.send("halo");
 });
-app.use("/api", apiEndpoints);
+// app.use("/api", apiEndpoints);
 // app.use(errorHandler);
 // app.use(multerErrorHandler);
 
